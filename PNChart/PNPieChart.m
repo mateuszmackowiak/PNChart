@@ -287,7 +287,7 @@
     }
     
     CGFloat percentage = [self findPercentageOfAngleInCircle:circleCenter fromPoint:touchLocation];
-    int index = 0;
+    NSUInteger index = 0;
     while (percentage > [self endPercentageForItemAtIndex:index]) {
         index ++;
     }
@@ -295,52 +295,69 @@
     if ([self.delegate respondsToSelector:@selector(userClickedOnPieIndexItem:)]) {
         [self.delegate userClickedOnPieIndexItem:index];
     }
+    [self selectItemAtIndex:index];
+}
+
+-(PNPieChartDataItem *)dataUnderPoint:(CGPoint)point {
+    CGPoint circleCenter = CGPointMake(_contentView.bounds.size.width/2, _contentView.bounds.size.height/2);
+    CGFloat distanceFromCenter = sqrtf(powf((point.y - circleCenter.y),2) + powf((point.x - circleCenter.x),2));
+    if (distanceFromCenter < _innerCircleRadius) {
+        return nil;
+    }
+    CGFloat percentage = [self findPercentageOfAngleInCircle:circleCenter fromPoint:point];
+    NSUInteger index = 0;
+    while (percentage > [self endPercentageForItemAtIndex:index]) {
+        index ++;
+    }
+    return [self dataItemForIndex:index];
+}
+
+- (void)selectItemAtIndex:(NSInteger)index {
+    if(index < 0 || index == NSIntegerMax) {
+        if ([self.delegate respondsToSelector:@selector(didUnselectPieItem)]) {
+            [self.delegate didUnselectPieItem];
+        }
+        [self.sectorHighlight removeFromSuperlayer];
+        return;
+    }
+    if (!self.shouldHighlightSectorOnTouch) {
+        return;
+    }
+    if (!self.enableMultipleSelection) {
+        if (self.sectorHighlight) {
+            [self.sectorHighlight removeFromSuperlayer];
+        }
+    }
+    PNPieChartDataItem *currentItem = [self dataItemForIndex:index];
     
-    if (self.shouldHighlightSectorOnTouch)
-    {
-        if (!self.enableMultipleSelection)
-        {
-            if (self.sectorHighlight)
-                [self.sectorHighlight removeFromSuperlayer];
-        }
-        
-        PNPieChartDataItem *currentItem = [self dataItemForIndex:index];
-        
-        CGFloat red,green,blue,alpha;
-        UIColor *old = currentItem.color;
-        [old getRed:&red green:&green blue:&blue alpha:&alpha];
-        alpha /= 2;
-        UIColor *newColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
-        
-        CGFloat startPercnetage = [self startPercentageForItemAtIndex:index];
-        CGFloat endPercentage   = [self endPercentageForItemAtIndex:index];
-        
-        self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius + 5
-                                                  borderWidth:10
-                                                    fillColor:[UIColor clearColor]
-                                                  borderColor:newColor
-                                              startPercentage:startPercnetage
-                                                endPercentage:endPercentage];
-        
-        if (self.enableMultipleSelection)
-        {
-            NSString *dictIndex = [NSString stringWithFormat:@"%d", index];
-            CAShapeLayer *indexShape = [self.selectedItems valueForKey:dictIndex];
-            if (indexShape)
-            {
-                [indexShape removeFromSuperlayer];
-                [self.selectedItems removeObjectForKey:dictIndex];
-            }
-            else
-            {
-                [self.selectedItems setObject:self.sectorHighlight forKey:dictIndex];
-                [_contentView.layer addSublayer:self.sectorHighlight];
-            }
-        }
-        else
-        {
-            [_contentView.layer addSublayer:self.sectorHighlight];
-        }
+    CGFloat red,green,blue,alpha;
+    UIColor *old = currentItem.color;
+    [old getRed:&red green:&green blue:&blue alpha:&alpha];
+    alpha /= 2;
+    UIColor *newColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+    
+    CGFloat startPercnetage = [self startPercentageForItemAtIndex:index];
+    CGFloat endPercentage   = [self endPercentageForItemAtIndex:index];
+    
+    self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius + 5
+                                              borderWidth:10
+                                                fillColor:[UIColor clearColor]
+                                              borderColor:newColor
+                                          startPercentage:startPercnetage
+                                            endPercentage:endPercentage];
+    
+    if (!self.enableMultipleSelection) {
+        [_contentView.layer addSublayer:self.sectorHighlight];
+        return;
+    }
+    NSString *dictIndex = [NSString stringWithFormat:@"%ld", (long)index];
+    CAShapeLayer *indexShape = [self.selectedItems valueForKey:dictIndex];
+    if (indexShape) {
+        [indexShape removeFromSuperlayer];
+        [self.selectedItems removeObjectForKey:dictIndex];
+    } else {
+        [self.selectedItems setObject:self.sectorHighlight forKey:dictIndex];
+        [_contentView.layer addSublayer:self.sectorHighlight];
     }
 }
 

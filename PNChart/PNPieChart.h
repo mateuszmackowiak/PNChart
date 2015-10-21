@@ -11,6 +11,8 @@
 #import "PNGenericChart.h"
 #import "PNChartDelegate.h"
 
+@class PNPieChartDataItem;
+
 @interface PNPieChart : PNGenericChart
 
 - (id)initWithFrame:(CGRect)frame items:(NSArray *)items;
@@ -61,5 +63,9 @@
 - (void)strokeChart;
 
 - (void)recompute;
+
+- (void)selectItemAtIndex:(NSInteger)index;
+
+- (PNPieChartDataItem *)dataUnderPoint:(CGPoint)point;
 
 @end
