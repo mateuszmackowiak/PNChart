@@ -52,6 +52,12 @@
 /** Current inner radius. Override recompute() to change this. **/
 @property (nonatomic) CGFloat innerCircleRadius;
 
+/** Default .5f */
+@property (nonatomic) CGFloat selectionAlphaMultiplier;
+
+/** Default 5.f */
+@property (nonatomic) CGFloat selectionOuterCircleThickness;
+
 @property (nonatomic, weak) id<PNChartDelegate> delegate;
 
 /** Update chart items. Does not update chart itself. */

@@ -57,7 +57,8 @@
         _duration = 1.0;
         _shouldHighlightSectorOnTouch = YES;
         _enableMultipleSelection = NO;
-        
+        _selectionAlphaMultiplier = .5f;
+        _selectionOuterCircleThickness = 10.f;
         [super setupDefaultValues];
         [self loadDefault];
     }
@@ -333,14 +334,14 @@
     CGFloat red,green,blue,alpha;
     UIColor *old = currentItem.color;
     [old getRed:&red green:&green blue:&blue alpha:&alpha];
-    alpha /= 2;
+    alpha *= self.selectionAlphaMultiplier;
     UIColor *newColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
     
     CGFloat startPercnetage = [self startPercentageForItemAtIndex:index];
     CGFloat endPercentage   = [self endPercentageForItemAtIndex:index];
     
-    self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius + 5
-                                              borderWidth:10
+    self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius
+                                              borderWidth:self.selectionOuterCircleThickness
                                                 fillColor:[UIColor clearColor]
                                               borderColor:newColor
                                           startPercentage:startPercnetage
