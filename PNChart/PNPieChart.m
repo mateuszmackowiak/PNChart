@@ -275,6 +275,9 @@
 
 - (void)didTouchAt:(CGPoint)touchLocation
 {
+    if(_items.count == 0){
+        return;
+    }
     CGPoint circleCenter = CGPointMake(_contentView.bounds.size.width/2, _contentView.bounds.size.height/2);
     
     CGFloat distanceFromCenter = sqrtf(powf((touchLocation.y - circleCenter.y),2) + powf((touchLocation.x - circleCenter.x),2));
