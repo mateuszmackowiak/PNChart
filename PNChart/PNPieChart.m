@@ -296,10 +296,13 @@
         index ++;
     }
     
+    if ([self.delegate respondsToSelector:@selector(userWillClickOnPieIndexItem:)]) {
+        [self.delegate userWillClickOnPieIndexItem:index];
+    }
+    [self selectItemAtIndex:index];
     if ([self.delegate respondsToSelector:@selector(userClickedOnPieIndexItem:)]) {
         [self.delegate userClickedOnPieIndexItem:index];
     }
-    [self selectItemAtIndex:index];
 }
 
 -(PNPieChartDataItem *)dataUnderPoint:(CGPoint)point {

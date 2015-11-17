@@ -28,6 +28,8 @@
 - (void)userClickedOnBarAtIndex:(NSInteger)barIndex;
 
 
+- (void)userWillClickOnPieIndexItem:(NSInteger)pieIndex;
 - (void)userClickedOnPieIndexItem:(NSInteger)pieIndex;
+
 - (void)didUnselectPieItem;
 @end
