@@ -43,30 +43,53 @@
 
 @implementation PNPieChart
 
--(id)initWithFrame:(CGRect)frame items:(NSArray *)items{
+-(instancetype)initWithFrame:(CGRect)frame items:(NSArray *)items{
     self = [self initWithFrame:frame];
-    if(self){
-        _items = [NSArray arrayWithArray:items];
-        _selectedItems = [NSMutableDictionary dictionary];
-        _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
-        _innerCircleRadius  = CGRectGetWidth(self.bounds) / 6;
-        _descriptionTextColor = [UIColor whiteColor];
-        _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:18.0];
-        _descriptionTextShadowColor  = [[UIColor blackColor] colorWithAlphaComponent:0.4];
-        _descriptionTextShadowOffset =  CGSizeMake(0, 1);
-        _duration = 1.0;
-        _shouldHighlightSectorOnTouch = YES;
-        _enableMultipleSelection = NO;
-        _selectionAlphaMultiplier = .5f;
-        _selectionOuterCircleThickness = 10.f;
-        [super setupDefaultValues];
-        [self loadDefault];
+    if(!self){
+        return nil;
     }
-    
+    _items = [NSArray arrayWithArray:items];
+    [self commonInit];
     return self;
 }
 
-- (void)loadDefault{
+-(instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if(!self){
+        return nil;
+    }
+    [self commonInit];
+    return self;
+}
+
+-(instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if(!self){
+        return nil;
+    }
+    [self commonInit];
+    return self;
+}
+
+- (void)commonInit {
+    _redrawOnLayoutSubviews = YES;
+    _selectedItems = [NSMutableDictionary dictionary];
+    _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
+    _innerCircleRadius  = CGRectGetWidth(self.bounds) / 6;
+    _descriptionTextColor = [UIColor whiteColor];
+    _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:18.0];
+    _descriptionTextShadowColor  = [[UIColor blackColor] colorWithAlphaComponent:0.4];
+    _descriptionTextShadowOffset =  CGSizeMake(0, 1);
+    _duration = 1.0;
+    _shouldHighlightSectorOnTouch = YES;
+    _enableMultipleSelection = NO;
+    _selectionAlphaMultiplier = .5f;
+    _selectionOuterCircleThickness = 10.f;
+    [super setupDefaultValues];
+    [self loadDefault];
+}
+
+- (void)loadDefault {
     __block CGFloat currentTotal = 0;
     CGFloat total = [[self.items valueForKeyPath:@"@sum.value"] floatValue];
     NSMutableArray *endPercentages = [NSMutableArray new];
@@ -87,7 +110,7 @@
     
     _pieLayer = [CAShapeLayer layer];
     [_contentView.layer addSublayer:_pieLayer];
-
+    
 }
 
 /** Override this to change how inner attributes are computed. **/
@@ -98,16 +121,19 @@
 
 #pragma mark -
 
-- (void)strokeChart{
+- (void)strokeChart {
+    [self strokeChartAnimated:YES];
+}
+
+- (void)strokeChartAnimated:(BOOL)animated {
     [self loadDefault];
     [self recompute];
     
     PNPieChartDataItem *currentItem;
-    for (int i = 0; i < _items.count; i++) {
+    for (NSUInteger i = 0; i < _items.count; i++) {
         currentItem = [self dataItemForIndex:i];
         
-        
-        CGFloat startPercnetage = [self startPercentageForItemAtIndex:i];
+        CGFloat startPercentage = [self startPercentageForItemAtIndex:i];
         CGFloat endPercentage   = [self endPercentageForItemAtIndex:i];
         
         CGFloat radius = _innerCircleRadius + (_outerCircleRadius - _innerCircleRadius) / 2;
@@ -117,13 +143,13 @@
                                                            borderWidth:borderWidth
                                                              fillColor:[UIColor clearColor]
                                                            borderColor:currentItem.color
-                                                       startPercentage:startPercnetage
+                                                       startPercentage:startPercentage
                                                          endPercentage:endPercentage];
         [_pieLayer addSublayer:currentPieLayer];
     }
-    
-    [self maskChart];
-    
+    if(animated) {
+        [self maskChart];
+    }
     for (int i = 0; i < _items.count; i++) {
         UILabel *descriptionLabel =  [self descriptionLabelForItemAtIndex:i];
         [_contentView addSubview:descriptionLabel];
@@ -296,13 +322,10 @@
         index ++;
     }
     
-    if ([self.delegate respondsToSelector:@selector(userWillClickOnPieIndexItem:)]) {
-        [self.delegate userWillClickOnPieIndexItem:index];
-    }
-    [self selectItemAtIndex:index];
     if ([self.delegate respondsToSelector:@selector(userClickedOnPieIndexItem:)]) {
         [self.delegate userClickedOnPieIndexItem:index];
     }
+    [self selectItemAtIndex:index];
 }
 
 -(PNPieChartDataItem *)dataUnderPoint:(CGPoint)point {
@@ -505,6 +528,9 @@
 /* Redraw the chart on autolayout */
 -(void)layoutSubviews {
     [super layoutSubviews];
+    if(!self.redrawOnLayoutSubviews){
+        return;
+    }
     [self strokeChart];
 }
 

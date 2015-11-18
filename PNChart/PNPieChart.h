@@ -15,7 +15,7 @@
 
 @interface PNPieChart : PNGenericChart
 
-- (id)initWithFrame:(CGRect)frame items:(NSArray *)items;
+- (instancetype)initWithFrame:(CGRect)frame items:(NSArray *)items;
 
 @property (nonatomic, readonly) NSArray	*items;
 
@@ -66,7 +66,11 @@
 /** Multiple selection */
 @property (nonatomic, assign) BOOL enableMultipleSelection;
 
+@property (nonatomic, assign) BOOL redrawOnLayoutSubviews;
+
 - (void)strokeChart;
+
+- (void)strokeChartAnimated:(BOOL)animated;
 
 - (void)recompute;
 
