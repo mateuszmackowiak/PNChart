@@ -107,7 +107,7 @@
     _axisY_labels = [NSMutableArray array];
     
     _descriptionTextColor = [UIColor blackColor];
-    _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:9.0];
+    _descriptionTextFont  = [UIFont systemFontOfSize:9.0];
     _descriptionTextShadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
     _descriptionTextShadowOffset =  CGSizeMake(0, 1);
     _duration = 1.0;

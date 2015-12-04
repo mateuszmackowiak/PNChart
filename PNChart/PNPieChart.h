@@ -31,6 +31,8 @@
 /** Default is CGSizeMake(0, 1). */
 @property (nonatomic) CGSize   descriptionTextShadowOffset;
 
+@property (nonatomic, assign) CGFloat spaceBetweenChartItems;
+
 /** Default is 1.0. */
 @property (nonatomic) NSTimeInterval duration;
 

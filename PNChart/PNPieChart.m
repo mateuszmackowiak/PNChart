@@ -77,7 +77,7 @@
     _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
     _innerCircleRadius  = CGRectGetWidth(self.bounds) / 6;
     _descriptionTextColor = [UIColor whiteColor];
-    _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:18.0];
+    _descriptionTextFont  = [UIFont systemFontOfSize:18.0];
     _descriptionTextShadowColor  = [[UIColor blackColor] colorWithAlphaComponent:0.4];
     _descriptionTextShadowOffset =  CGSizeMake(0, 1);
     _duration = 1.0;
@@ -135,7 +135,13 @@
         
         CGFloat startPercentage = [self startPercentageForItemAtIndex:i];
         CGFloat endPercentage   = [self endPercentageForItemAtIndex:i];
-        
+        if(self.spaceBetweenChartItems >0){
+            CGFloat s = self.spaceBetweenChartItems /100;
+            if(endPercentage - startPercentage > s){
+                startPercentage += s/2;
+                endPercentage -= s/2;
+            }
+        }
         CGFloat radius = _innerCircleRadius + (_outerCircleRadius - _innerCircleRadius) / 2;
         CGFloat borderWidth = _outerCircleRadius - _innerCircleRadius;
         
